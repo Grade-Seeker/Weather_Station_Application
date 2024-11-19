@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Station</title>
+    <script src="js/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        #chartContainer {
+            margin-top: 30px;
+        }
+        canvas {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather Station Application</h1>
+    <button id="requestDataButton">Request Data</button>
+    <button id="dataAnalysisButton">Data Analysis</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Weather Station</th>
+                <th>Temperature (°C)</th>
+                <th>Time Stamp</th>
+            </tr>
+        </thead>
+        <tbody id="dataTableBody">
+        </tbody>
+    </table>
+
+    <div id="chartContainer">
+        <canvas id="weatherChart"></canvas>
+    </div>
+
+    <script>
+        // Data storage
+        const temperatureData = [];
+        const timeStampData = [];
+
+        // Generate data and populate the table
+        document.getElementById('requestDataButton').addEventListener('click', function() {
+            // Generate random temperature between 10 and 20
+            const randomTemperature = (Math.random() * 10 + 10).toFixed(2);
+
+            // Get current timestamp
+            const timestamp = new Date().toLocaleString();
+
+            // Add data to arrays
+            temperatureData.push(parseFloat(randomTemperature));
+            timeStampData.push(timestamp);
+
+            // Update table
+            const tableBody = document.getElementById('dataTableBody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>1</td>
+                <td>${randomTemperature} °C</td>
+                <td>${timestamp}</td>
+            `;
+            tableBody.appendChild(newRow);
+        });
+
+        // Create Chart.js chart
+        let weatherChart = null;
+        document.getElementById('dataAnalysisButton').addEventListener('click', function() {
+            const ctx = document.getElementById('weatherChart').getContext('2d');
+
+            // If the chart already exists, destroy it to update
+            if (weatherChart) {
+                weatherChart.destroy();
+            }
+
+            // Create a new chart
+            weatherChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeStampData,
+                    datasets: [{
+                        label: 'Temperature (°C)',
+                        data: temperatureData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.raw} °C`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time Stamp'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Temperature (°C)'
+                            },
+                            min: 10,
+                            max: 20
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
